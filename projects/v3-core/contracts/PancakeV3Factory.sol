@@ -43,22 +43,22 @@ contract PancakeV3Factory is IPancakeV3Factory {
         require(_defaultFeeProtocol <= 10000);
         defaultFeeProtocol = _defaultFeeProtocol;
 
-        feeAmountTickSpacing[100] = 1;
-        feeAmountTickSpacingExtraInfo[100] = TickSpacingExtraInfo({whitelistRequested: false, enabled: true});
-        emit FeeAmountEnabled(100, 1);
-        emit FeeAmountExtraInfoUpdated(100, false, true);
-        feeAmountTickSpacing[500] = 10;
+        feeAmountTickSpacing[1000] = 20;
         feeAmountTickSpacingExtraInfo[500] = TickSpacingExtraInfo({whitelistRequested: false, enabled: true});
-        emit FeeAmountEnabled(500, 10);
+        emit FeeAmountEnabled(1000, 20);
         emit FeeAmountExtraInfoUpdated(500, false, true);
-        feeAmountTickSpacing[2500] = 50;
+        feeAmountTickSpacing[3000] = 60;
         feeAmountTickSpacingExtraInfo[2500] = TickSpacingExtraInfo({whitelistRequested: false, enabled: true});
-        emit FeeAmountEnabled(2500, 50);
+        emit FeeAmountEnabled(3000, 60);
         emit FeeAmountExtraInfoUpdated(2500, false, true);
         feeAmountTickSpacing[10000] = 200;
         feeAmountTickSpacingExtraInfo[10000] = TickSpacingExtraInfo({whitelistRequested: false, enabled: true});
         emit FeeAmountEnabled(10000, 200);
         emit FeeAmountExtraInfoUpdated(10000, false, true);
+        feeAmountTickSpacing[50000] = 1000;
+        feeAmountTickSpacingExtraInfo[50000] = TickSpacingExtraInfo({whitelistRequested: false, enabled: true});
+        emit FeeAmountEnabled(50000, 1000);
+        emit FeeAmountExtraInfoUpdated(50000, false, true);
     }
 
     /// @inheritdoc IPancakeV3Factory
