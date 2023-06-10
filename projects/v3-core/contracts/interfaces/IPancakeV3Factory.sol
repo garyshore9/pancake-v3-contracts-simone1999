@@ -57,6 +57,11 @@ interface IPancakeV3Factory {
     /// @return whitelistRequested The flag whether should be created by white list users only
     function feeAmountTickSpacingExtraInfo(uint24 fee) external view returns (bool whitelistRequested, bool enabled);
 
+    /// @notice Returns the default protocol fee
+    /// @dev Can be changed by the current owner via setDefaultFeeProtocol
+    /// @return The uint32 of the protocol fee cut where 10_000 means all trading fees goes to the protocol
+    function defaultFeeProtocol() external view returns (uint32);
+
     /// @notice Returns the pool address for a given pair of tokens and a fee, or address 0 if it does not exist
     /// @dev tokenA and tokenB may be passed in either token0/token1 or token1/token0 order
     /// @param tokenA The contract address of either token0 or token1

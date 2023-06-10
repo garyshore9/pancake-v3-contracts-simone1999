@@ -285,25 +285,18 @@ contract PancakeV3Pool is IPancakeV3Pool {
 
         (uint16 cardinality, uint16 cardinalityNext) = observations.initialize(_blockTimestamp());
 
+        uint32 defaultFeeProtocol = IPancakeV3Factory(factory).defaultFeeProtocol();
+        uint32 feeProtocol = defaultFeeProtocol + (defaultFeeProtocol << 16);
+
         slot0 = Slot0({
             sqrtPriceX96: sqrtPriceX96,
             tick: tick,
             observationIndex: 0,
             observationCardinality: cardinality,
             observationCardinalityNext: cardinalityNext,
-            feeProtocol: 209718400, // default value for all pools, 3200:3200, store 2 uint32 inside
+            feeProtocol: feeProtocol,
             unlocked: true
         });
-
-        if (fee == 100) {
-            slot0.feeProtocol = 216272100; // value for 3300:3300, store 2 uint32 inside
-        } else if (fee == 500) {
-            slot0.feeProtocol = 222825800; // value for 3400:3400, store 2 uint32 inside
-        } else if (fee == 2500) {
-            slot0.feeProtocol = 209718400; // value for 3200:3200, store 2 uint32 inside
-        } else if (fee == 10000) {
-            slot0.feeProtocol = 209718400; // value for 3200:3200, store 2 uint32 inside
-        }
 
         emit Initialize(sqrtPriceX96, tick);
     }
@@ -866,10 +859,7 @@ contract PancakeV3Pool is IPancakeV3Pool {
 
     /// @inheritdoc IPancakeV3PoolOwnerActions
     function setFeeProtocol(uint32 feeProtocol0, uint32 feeProtocol1) external override lock onlyFactoryOrFactoryOwner {
-        require(
-            (feeProtocol0 == 0 || (feeProtocol0 >= 1000 && feeProtocol0 <= 4000)) &&
-            (feeProtocol1 == 0 || (feeProtocol1 >= 1000 && feeProtocol1 <= 4000))
-        );
+        require((feeProtocol0 <= PROTOCOL_FEE_DENOMINATOR) && (feeProtocol1 <= PROTOCOL_FEE_DENOMINATOR));
 
         uint32 feeProtocolOld = slot0.feeProtocol;
         slot0.feeProtocol = feeProtocol0 + (feeProtocol1 << 16);

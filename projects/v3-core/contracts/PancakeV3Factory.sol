@@ -23,6 +23,8 @@ contract PancakeV3Factory is IPancakeV3Factory {
 
     address public lmPoolDeployer;
 
+    uint32 public override defaultFeeProtocol;
+
     modifier onlyOwner() {
         require(msg.sender == owner, "Not owner");
         _;
@@ -33,10 +35,13 @@ contract PancakeV3Factory is IPancakeV3Factory {
         _;
     }
 
-    constructor(address _poolDeployer) {
+    constructor(address _poolDeployer, uint32 _defaultFeeProtocol) {
         poolDeployer = _poolDeployer;
         owner = msg.sender;
         emit OwnerChanged(address(0), msg.sender);
+
+        require(_defaultFeeProtocol <= 10000);
+        defaultFeeProtocol = _defaultFeeProtocol;
 
         feeAmountTickSpacing[100] = 1;
         feeAmountTickSpacingExtraInfo[100] = TickSpacingExtraInfo({whitelistRequested: false, enabled: true});
@@ -126,6 +131,11 @@ contract PancakeV3Factory is IPancakeV3Factory {
     function setLmPoolDeployer(address _lmPoolDeployer) external override onlyOwner {
         lmPoolDeployer = _lmPoolDeployer;
         emit SetLmPoolDeployer(_lmPoolDeployer);
+    }
+
+    function setDefaultFeeProtocol(uint32 _defaultFeeProtocol) external onlyOwner {
+        require(_defaultFeeProtocol <= 10000);
+        defaultFeeProtocol = _defaultFeeProtocol;
     }
 
     function setFeeProtocol(address pool, uint32 feeProtocol0, uint32 feeProtocol1) external override onlyOwner {
