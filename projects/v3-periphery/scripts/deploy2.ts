@@ -129,7 +129,7 @@ async function main() {
     owner
   )
   const nonfungibleTokenPositionDescriptor = await upgrades.deployProxy(NonfungibleTokenPositionDescriptor, [
-    BASE_TOKEN_URI,
+    `${BASE_TOKEN_URI}${(await ethers.provider.getNetwork()).chainId}/`,
   ])
   await nonfungibleTokenPositionDescriptor.deployed()
   console.log('nonfungibleTokenPositionDescriptor', nonfungibleTokenPositionDescriptor.address)

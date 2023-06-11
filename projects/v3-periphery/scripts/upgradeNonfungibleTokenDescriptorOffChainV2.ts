@@ -2,6 +2,8 @@ import { ethers, upgrades } from 'hardhat'
 
 import NftDescriptorOffchainV2Artifact from '../artifacts/contracts/NonfungibleTokenPositionDescriptorOffChainV2.sol/NonfungibleTokenPositionDescriptorOffChainV2.json'
 
+const BASE_TOKEN_URI = 'https://nft.icecreamswap.com/v3/'
+
 async function main() {
   const [owner] = await ethers.getSigners()
   console.log('owner', owner.address)
@@ -11,7 +13,7 @@ async function main() {
   const NonfungibleTokenPositionDescriptorV2 = await ethers.getContractFactoryFromArtifact(
     NftDescriptorOffchainV2Artifact
   )
-  const baseTokenUri = `https://nft.pancakeswap.com/v3/${network.chainId}/`
+  const baseTokenUri = `${BASE_TOKEN_URI}${network.chainId}/`
   console.log(baseTokenUri)
   const nonfungibleTokenPositionDescriptor = await upgrades.upgradeProxy(
     process.env.NFT_DESC_OFFCHAIN_ADDRESS!,
