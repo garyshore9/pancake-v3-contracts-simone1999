@@ -6,6 +6,8 @@ import { tryVerify } from '@pancakeswap/common/verify'
 import { configs } from '@pancakeswap/common/config'
 import fs from 'fs'
 
+const BASE_TOKEN_URI = 'https://nft.icecreamswap.com/v3/'
+
 type ContractJson = { abi: any; bytecode: string }
 const artifacts: { [name: string]: ContractJson } = {
   QuoterV2: require('../artifacts/contracts/lens/QuoterV2.sol/QuoterV2.json'),
@@ -15,11 +17,11 @@ const artifacts: { [name: string]: ContractJson } = {
   // eslint-disable-next-line global-require
   SwapRouter: require('../artifacts/contracts/SwapRouter.sol/SwapRouter.json'),
   // eslint-disable-next-line global-require
-  NFTDescriptor: require('../artifacts/contracts/libraries/NFTDescriptor.sol/NFTDescriptor.json'),
+  // NFTDescriptor: require('../artifacts/contracts/libraries/NFTDescriptor.sol/NFTDescriptor.json'),
   // eslint-disable-next-line global-require
-  NFTDescriptorEx: require('../artifacts/contracts/NFTDescriptorEx.sol/NFTDescriptorEx.json'),
+  // NFTDescriptorEx: require('../artifacts/contracts/NFTDescriptorEx.sol/NFTDescriptorEx.json'),
   // eslint-disable-next-line global-require
-  NonfungibleTokenPositionDescriptor: require('../artifacts/contracts/NonfungibleTokenPositionDescriptor.sol/NonfungibleTokenPositionDescriptor.json'),
+  // NonfungibleTokenPositionDescriptor: require('../artifacts/contracts/NonfungibleTokenPositionDescriptor.sol/NonfungibleTokenPositionDescriptor.json'),
   // eslint-disable-next-line global-require
   NonfungibleTokenPositionDescriptorOffChain: require('../artifacts/contracts/NonfungibleTokenPositionDescriptorOffChain.sol/NonfungibleTokenPositionDescriptorOffChain.json'),
   // eslint-disable-next-line global-require
@@ -126,9 +128,8 @@ async function main() {
     artifacts.NonfungibleTokenPositionDescriptorOffChain.bytecode,
     owner
   )
-  const baseTokenUri = 'https://nft.pancakeswap.com/v3/'
   const nonfungibleTokenPositionDescriptor = await upgrades.deployProxy(NonfungibleTokenPositionDescriptor, [
-    baseTokenUri,
+    BASE_TOKEN_URI,
   ])
   await nonfungibleTokenPositionDescriptor.deployed()
   console.log('nonfungibleTokenPositionDescriptor', nonfungibleTokenPositionDescriptor.address)

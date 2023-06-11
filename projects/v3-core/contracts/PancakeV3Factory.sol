@@ -35,13 +35,12 @@ contract PancakeV3Factory is IPancakeV3Factory {
         _;
     }
 
-    constructor(address _poolDeployer, uint32 _defaultFeeProtocol) {
+    constructor(address _poolDeployer) {
         poolDeployer = _poolDeployer;
         owner = msg.sender;
         emit OwnerChanged(address(0), msg.sender);
 
-        require(_defaultFeeProtocol <= 10000);
-        defaultFeeProtocol = _defaultFeeProtocol;
+        defaultFeeProtocol = 3300;
 
         feeAmountTickSpacing[1000] = 20;
         feeAmountTickSpacingExtraInfo[500] = TickSpacingExtraInfo({whitelistRequested: false, enabled: true});

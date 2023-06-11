@@ -69,7 +69,8 @@ library SmartRouterHelper {
     // bytes32 internal constant V2_INIT_CODE_HASH = 0xd0d4c4cd0848c93cb4fd1f498d7013ee6bfb25783ea21593d5834f5d250ece66; // BSC TESTNET
     // bytes32 internal constant V2_INIT_CODE_HASH = 0x00fb7f630766e6a796048ea87d01acd3068e8ff67d078148a3fa3f4a84f69bd5; // BSC
     // bytes32 internal constant V2_INIT_CODE_HASH = 0x57224589c67f3f30a6b0d7a1b54cf3153ab84563bc609ef41dfb34f8b2974d2d; // ETH, GOERLI
-    bytes32 internal constant V2_INIT_CODE_HASH = 0xd0d4c4cd0848c93cb4fd1f498d7013ee6bfb25783ea21593d5834f5d250ece66;
+    // bytes32 internal constant V2_INIT_CODE_HASH = 0x58c1b429d0ffdb4407396ae8118c58fed54898473076d0394163ea2198f7c4a3; // CORE
+    bytes32 internal constant V2_INIT_CODE_HASH = 0x58c1b429d0ffdb4407396ae8118c58fed54898473076d0394163ea2198f7c4a3;
 
     // returns sorted token addresses, used to handle return values from pairs sorted in this order
     function sortTokens(address tokenA, address tokenB) public pure returns (address token0, address token1) {
@@ -156,7 +157,7 @@ library SmartRouterHelper {
 
     /************************************************** V3 **************************************************/
 
-    bytes32 internal constant V3_INIT_CODE_HASH = 0x6ce8eb472fa82df5469c6ab6d485f17c3ad13c8cd7af59b3d4a8026c5ce0f7e2;
+    bytes32 internal constant V3_INIT_CODE_HASH = 0x4a368fd18f9a1f54d377052fbabd82aa768582b85d80f470018290f3364574a9;
 
     /// @notice The identifying key of the pool
     struct PoolKey {

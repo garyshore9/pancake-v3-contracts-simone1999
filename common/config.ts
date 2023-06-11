@@ -44,4 +44,13 @@ export const configs = {
     cake: '0x0000000000000000000000000000000000000000',
     smartRouterHelper: '0xdAecee3C08e953Bd5f89A5Cc90ac560413d709E3',
   },
+  core: {
+    WNATIVE: '0x40375C92d9FAf44d2f9db9Bd9ba41a3317a2404f',
+    nativeCurrencyLabel: 'CORE',
+    v2Factory: '0x9e6d21e759a7a288b80eef94e4737d313d31c13f',
+    stableFactory: '0x0000000000000000000000000000000000000000',
+    stableInfo: '0x0000000000000000000000000000000000000000',
+    cake: '0xc0E49f8C615d3d4c245970F6Dc528E4A47d69a44',
+    smartRouterHelper: '',
+  },
 } as const
