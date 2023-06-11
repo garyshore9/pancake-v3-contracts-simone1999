@@ -8,65 +8,11 @@ import 'dotenv/config'
 import 'hardhat-tracer'
 import '@nomiclabs/hardhat-etherscan'
 import 'solidity-docgen'
-require('dotenv').config({ path: require('find-config')('.env') })
-
-// const bscTestnet: NetworkUserConfig = {
-//   url: 'https://rpc.ankr.com/bsc_testnet_chapel',
-//   chainId: 97,
-//   accounts: [process.env.KEY_TESTNET!],
-// }
-
-// const goerli: NetworkUserConfig = {
-//   url: `https://eth-goerli.g.alchemy.com/v2/${process.env.GOERLI_API_KEY}`,
-//   chainId: 5,
-//   // accounts: [process.env.KEY_GOERLI!],
-// }
-
-// const bscMainnet: NetworkUserConfig = {
-//   url: 'https://bsc-dataseed.binance.org/',
-//   chainId: 56,
-//   // accounts: [process.env.KEY_MAINNET!],
-// }
-
-const bscTestnet: NetworkUserConfig = {
-  url: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
-  chainId: 97,
-  accounts: [process.env.KEY_TESTNET!],
-}
-
-const bscMainnet: NetworkUserConfig = {
-  url: 'https://bsc-dataseed.binance.org/',
-  chainId: 56,
-  accounts: [process.env.KEY_MAINNET!],
-}
-
-const goerli: NetworkUserConfig = {
-  url: 'https://rpc.ankr.com/eth_goerli',
-  chainId: 5,
-  accounts: [process.env.KEY_GOERLI!],
-}
-
-const eth: NetworkUserConfig = {
-  url: 'https://eth.llamarpc.com',
-  chainId: 1,
-  accounts: [process.env.KEY_ETH!],
-}
+import { networks } from '@icecreamswap/networks'
 
 const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
-  networks: {
-    hardhat: {
-      forking: {
-        url: bscTestnet.url || '',
-      },
-    },
-    ...(process.env.KEY_TESTNET && { bscTestnet }),
-    ...(process.env.KEY_MAINNET && { bscMainnet }),
-    ...(process.env.KEY_GOERLI && { goerli }),
-    ...(process.env.KEY_ETH && { eth }),
-    // goerli: goerli,
-    // mainnet: bscMainnet,
-  },
+  networks,
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY || '',
   },
