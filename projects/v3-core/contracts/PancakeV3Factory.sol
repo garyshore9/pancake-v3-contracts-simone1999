@@ -43,11 +43,11 @@ contract PancakeV3Factory is IPancakeV3Factory {
         defaultFeeProtocol = 3300;
 
         feeAmountTickSpacing[1000] = 20;
-        feeAmountTickSpacingExtraInfo[500] = TickSpacingExtraInfo({whitelistRequested: false, enabled: true});
+        feeAmountTickSpacingExtraInfo[1000] = TickSpacingExtraInfo({whitelistRequested: false, enabled: true});
         emit FeeAmountEnabled(1000, 20);
         emit FeeAmountExtraInfoUpdated(500, false, true);
         feeAmountTickSpacing[3000] = 60;
-        feeAmountTickSpacingExtraInfo[2500] = TickSpacingExtraInfo({whitelistRequested: false, enabled: true});
+        feeAmountTickSpacingExtraInfo[3000] = TickSpacingExtraInfo({whitelistRequested: false, enabled: true});
         emit FeeAmountEnabled(3000, 60);
         emit FeeAmountExtraInfoUpdated(2500, false, true);
         feeAmountTickSpacing[10000] = 200;
