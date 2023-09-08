@@ -12,9 +12,16 @@ const core: NetworkUserConfig = {
   accounts: [process.env.KEY_CORE!],
 }
 
+const xdc: NetworkUserConfig = {
+  url: 'https://erpc.xdcrpc.com',
+  chainId: 50,
+  accounts: [process.env.KEY_XDC!],
+}
+
 export const networks = {
   hardhat: {
     allowUnlimitedContractSize: true,
   },
   ...(process.env.KEY_CORE && { core }),
+  ...(process.env.KEY_XDC && { xdc }),
 }
