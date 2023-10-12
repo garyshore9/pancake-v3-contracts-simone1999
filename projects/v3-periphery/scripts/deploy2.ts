@@ -13,7 +13,7 @@ const artifacts: { [name: string]: ContractJson } = {
   QuoterV2: require('../artifacts/contracts/lens/QuoterV2.sol/QuoterV2.json'),
   TickLens: require('../artifacts/contracts/lens/TickLens.sol/TickLens.json'),
   V3Migrator: require('../artifacts/contracts/V3Migrator.sol/V3Migrator.json'),
-  PancakeInterfaceMulticall: require('../artifacts/contracts/lens/PancakeInterfaceMulticall.sol/PancakeInterfaceMulticall.json'),
+  PancakeInterfaceMulticallV2: require('../artifacts/contracts/lens/PancakeInterfaceMulticallV2.sol/PancakeInterfaceMulticall.json'),
   // eslint-disable-next-line global-require
   SwapRouter: require('../artifacts/contracts/SwapRouter.sol/SwapRouter.json'),
   // eslint-disable-next-line global-require
@@ -156,16 +156,16 @@ async function main() {
   // ])
   console.log('nonfungiblePositionManager', nonfungiblePositionManager.address)
 
-  const PancakeInterfaceMulticall = new ContractFactory(
-    artifacts.PancakeInterfaceMulticall.abi,
-    artifacts.PancakeInterfaceMulticall.bytecode,
+  const PancakeInterfaceMulticallV2 = new ContractFactory(
+    artifacts.PancakeInterfaceMulticallV2.abi,
+    artifacts.PancakeInterfaceMulticallV2.bytecode,
     owner
   )
 
-  const pancakeInterfaceMulticall = await PancakeInterfaceMulticall.deploy()
-  console.log('PancakeInterfaceMulticall', pancakeInterfaceMulticall.address)
+  const pancakeInterfaceMulticallV2 = await PancakeInterfaceMulticallV2.deploy()
+  console.log('PancakeInterfaceMulticallV2', pancakeInterfaceMulticallV2.address)
 
-  // await tryVerify(pancakeInterfaceMulticall)
+  // await tryVerify(pancakeInterfaceMulticallV2)
 
   const V3Migrator = new ContractFactory(artifacts.V3Migrator.abi, artifacts.V3Migrator.bytecode, owner)
   const v3Migrator = await V3Migrator.deploy(
@@ -204,7 +204,7 @@ async function main() {
     // NFTDescriptorEx: nftDescriptorEx.address,
     NonfungibleTokenPositionDescriptor: nonfungibleTokenPositionDescriptor.address,
     NonfungiblePositionManager: nonfungiblePositionManager.address,
-    PancakeInterfaceMulticall: pancakeInterfaceMulticall.address,
+    PancakeInterfaceMulticallV2: pancakeInterfaceMulticallV2.address,
   }
 
   fs.writeFileSync(`./deployments/${networkName}.json`, JSON.stringify(contracts, null, 2))
