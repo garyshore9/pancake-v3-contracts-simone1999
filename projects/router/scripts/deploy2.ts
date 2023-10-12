@@ -77,6 +77,7 @@ async function main() {
   // ])
 
   /** TokenValidator */
+  /*
   const TokenValidator = await ethers.getContractFactory('TokenValidator', {
     libraries: {
       SmartRouterHelper: smartRouterHelper.address,
@@ -84,6 +85,7 @@ async function main() {
   })
   const tokenValidator = await TokenValidator.deploy(config.v2Factory, positionManager_address)
   console.log('TokenValidator deployed to:', tokenValidator.address)
+  */
 
   // await tryVerify(tokenValidator, [config.v2Factory, positionManager_address])
 
@@ -92,7 +94,7 @@ async function main() {
     SmartRouterHelper: smartRouterHelper.address,
     MixedRouteQuoterV1: mixedRouteQuoterV1.address,
     // QuoterV2: quoterV2.address,
-    TokenValidator: tokenValidator.address,
+    // TokenValidator: tokenValidator.address,
   }
 
   writeFileSync(`./deployments/${network.name}.json`, JSON.stringify(contracts, null, 2))
