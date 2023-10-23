@@ -92,8 +92,8 @@ contract MasterChefV3 is INonfungiblePositionManagerStruct, Multicall, Ownable, 
     /// @notice Address of the operator.
     address public operatorAddress;
     /// @notice Default period duration.
-    uint256 public PERIOD_DURATION = 1 days;
-    uint256 public constant MAX_DURATION = 30 days;
+    uint256 public PERIOD_DURATION = 30 days;
+    uint256 public constant MAX_DURATION = 1 years;
     uint256 public constant MIN_DURATION = 1 days;
     uint256 public constant PRECISION = 1e12;
     /// @notice Basic boost factor, none boosted user's boost factor
@@ -715,10 +715,22 @@ contract MasterChefV3 is INonfungiblePositionManagerStruct, Multicall, Ownable, 
     /// @param _duration The period duration.
     /// @param _withUpdate Whether call "massUpdatePools" operation.
     function upkeep(uint256 _amount, uint256 _duration, bool _withUpdate) external onlyReceiver {
-        // Transfer cake token from receiver.
-        CAKE.safeTransferFrom(receiver, address(this), _amount);
-        // Update cakeAmountBelongToMC
-        unchecked {
+        uint256 currentTime = block.timestamp;
+        if (latestPeriodEndTime > currentTime) {
+            uint256 remainingCake = ((latestPeriodEndTime - currentTime) * latestPeriodCakePerSecond) / PRECISION;
+            emit UpdateUpkeepPeriod(latestPeriodNumber, latestPeriodEndTime, currentTime, remainingCake);
+            if (remainingCake < _amount) {
+                // Transfer missing ICE token from receiver.
+                CAKE.safeTransferFrom(receiver, address(this), _amount - remainingCake);
+                cakeAmountBelongToMC += _amount - remainingCake;
+            } else if (remainingCake > _amount) {
+                // Transfer excess ICE token to receiver.
+                CAKE.safeTransfer(receiver, remainingCake - _amount);
+                cakeAmountBelongToMC -= remainingCake - _amount;
+            }
+        } else {
+            // Transfer ICE token from receiver.
+            CAKE.safeTransferFrom(receiver, address(this), _amount);
             cakeAmountBelongToMC += _amount;
         }
 
@@ -727,23 +739,16 @@ contract MasterChefV3 is INonfungiblePositionManagerStruct, Multicall, Ownable, 
         uint256 duration = PERIOD_DURATION;
         // Only use the _duration when _duration is between MIN_DURATION and MAX_DURATION.
         if (_duration >= MIN_DURATION && _duration <= MAX_DURATION) duration = _duration;
-        uint256 currentTime = block.timestamp;
         uint256 endTime = currentTime + duration;
         uint256 cakePerSecond;
-        uint256 cakeAmount = _amount;
-        if (latestPeriodEndTime > currentTime) {
-            uint256 remainingCake = ((latestPeriodEndTime - currentTime) * latestPeriodCakePerSecond) / PRECISION;
-            emit UpdateUpkeepPeriod(latestPeriodNumber, latestPeriodEndTime, currentTime, remainingCake);
-            cakeAmount += remainingCake;
-        }
-        cakePerSecond = (cakeAmount * PRECISION) / duration;
+        cakePerSecond = (_amount * PRECISION) / duration;
         unchecked {
             latestPeriodNumber++;
             latestPeriodStartTime = currentTime + 1;
             latestPeriodEndTime = endTime;
             latestPeriodCakePerSecond = cakePerSecond;
         }
-        emit NewUpkeepPeriod(latestPeriodNumber, currentTime + 1, endTime, cakePerSecond, cakeAmount);
+        emit NewUpkeepPeriod(latestPeriodNumber, currentTime + 1, endTime, cakePerSecond, _amount);
     }
 
     /// @notice Update cake reward for all the liquidity mining pool.
