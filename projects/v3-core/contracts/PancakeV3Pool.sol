@@ -285,7 +285,7 @@ contract PancakeV3Pool is IPancakeV3Pool {
 
         (uint16 cardinality, uint16 cardinalityNext) = observations.initialize(_blockTimestamp());
 
-        uint32 defaultFeeProtocol = IPancakeV3Factory(factory).defaultFeeProtocol();
+        uint32 defaultFeeProtocol = IPancakeV3Factory(factory).getDefaultProtocolFee(fee);
         uint32 feeProtocol = defaultFeeProtocol + (defaultFeeProtocol << 16);
 
         slot0 = Slot0({

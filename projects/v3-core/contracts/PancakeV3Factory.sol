@@ -23,7 +23,8 @@ contract PancakeV3Factory is IPancakeV3Factory {
 
     address public lmPoolDeployer;
 
-    uint32 public override defaultFeeProtocol;
+    uint32 public defaultProtocolFee;
+    mapping(uint24 => uint32) public defaultProtocolFeeForFee;
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Not owner");
@@ -40,7 +41,7 @@ contract PancakeV3Factory is IPancakeV3Factory {
         owner = msg.sender;
         emit OwnerChanged(address(0), msg.sender);
 
-        defaultFeeProtocol = 3300;
+        defaultProtocolFee = 5000;
 
         feeAmountTickSpacing[1000] = 20;
         feeAmountTickSpacingExtraInfo[1000] = TickSpacingExtraInfo({whitelistRequested: false, enabled: true});
@@ -132,9 +133,21 @@ contract PancakeV3Factory is IPancakeV3Factory {
         emit SetLmPoolDeployer(_lmPoolDeployer);
     }
 
-    function setDefaultFeeProtocol(uint32 _defaultFeeProtocol) external onlyOwner {
-        require(_defaultFeeProtocol <= 10000);
-        defaultFeeProtocol = _defaultFeeProtocol;
+    function getDefaultProtocolFee(uint24 fee) external view override returns (uint32 protocolFee) {
+        protocolFee = defaultProtocolFeeForFee[fee];
+        if (protocolFee == 0) {
+            protocolFee = defaultProtocolFee;
+        }
+    }
+
+    function setDefaultProtocolFee(uint32 protocolFee) external onlyOwner {
+        require(protocolFee <= 10000);
+        defaultProtocolFee = protocolFee;
+    }
+
+    function setDefaultProtocolFeeForFee(uint32 protocolFee, uint24 fee) external onlyOwner {
+        require(protocolFee <= 10000);
+        defaultProtocolFeeForFee[fee] = protocolFee;
     }
 
     function setFeeProtocol(address pool, uint32 feeProtocol0, uint32 feeProtocol1) external override onlyOwner {
