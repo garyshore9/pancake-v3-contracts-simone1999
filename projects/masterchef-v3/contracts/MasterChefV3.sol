@@ -93,7 +93,7 @@ contract MasterChefV3 is INonfungiblePositionManagerStruct, Multicall, Ownable, 
     address public operatorAddress;
     /// @notice Default period duration.
     uint256 public PERIOD_DURATION = 30 days;
-    uint256 public constant MAX_DURATION = 1 years;
+    uint256 public constant MAX_DURATION = 365 days;
     uint256 public constant MIN_DURATION = 1 days;
     uint256 public constant PRECISION = 1e12;
     /// @notice Basic boost factor, none boosted user's boost factor
@@ -256,7 +256,7 @@ contract MasterChefV3 is INonfungiblePositionManagerStruct, Multicall, Ownable, 
         emit NewReceiver(_receiver);
     }
 
-    function setLMPoolDeployer(ILMPoolDeployer _LMPoolDeployer) external onlyOwner {
+    function setLmPoolDeployer(ILMPoolDeployer _LMPoolDeployer) external onlyOwner {
         if (address(_LMPoolDeployer) == address(0)) revert ZeroAddress();
         LMPoolDeployer = _LMPoolDeployer;
         emit NewLMPoolDeployerAddress(address(_LMPoolDeployer));
