@@ -13,7 +13,7 @@ const artifacts: { [name: string]: ContractJson } = {
   QuoterV2: require('../artifacts/contracts/lens/QuoterV2.sol/QuoterV2.json'),
   TickLens: require('../artifacts/contracts/lens/TickLens.sol/TickLens.json'),
   V3Migrator: require('../artifacts/contracts/V3Migrator.sol/V3Migrator.json'),
-  PancakeInterfaceMulticallV2: require('../artifacts/contracts/lens/PancakeInterfaceMulticallV2.sol/PancakeInterfaceMulticall.json'),
+  PancakeInterfaceMulticallV2: require('../artifacts/contracts/lens/PancakeInterfaceMulticallV2.sol/PancakeInterfaceMulticallV2.json'),
   // eslint-disable-next-line global-require
   SwapRouter: require('../artifacts/contracts/SwapRouter.sol/SwapRouter.json'),
   // eslint-disable-next-line global-require
