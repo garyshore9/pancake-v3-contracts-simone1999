@@ -8,9 +8,9 @@ import '@pancakeswap/v3-core/contracts/interfaces/callback/IPancakeV3SwapCallbac
 /// @notice Functions for swapping tokens via PancakeSwap V3
 interface IV3SwapRouter is IPancakeV3SwapCallback {
     struct ExactInputSingleParams {
+        address pool;
         address tokenIn;
         address tokenOut;
-        uint24 fee;
         address recipient;
         uint256 amountIn;
         uint256 amountOutMinimum;
@@ -39,9 +39,9 @@ interface IV3SwapRouter is IPancakeV3SwapCallback {
     function exactInput(ExactInputParams calldata params) external payable returns (uint256 amountOut);
 
     struct ExactOutputSingleParams {
+        address pool;
         address tokenIn;
         address tokenOut;
-        uint24 fee;
         address recipient;
         uint256 amountOut;
         uint256 amountInMaximum;

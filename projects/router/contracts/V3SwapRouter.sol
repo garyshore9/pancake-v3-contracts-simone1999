@@ -4,7 +4,6 @@ pragma abicoder v2;
 
 import '@pancakeswap/v3-core/contracts/libraries/SafeCast.sol';
 import '@pancakeswap/v3-core/contracts/libraries/TickMath.sol';
-import '@pancakeswap/v3-periphery/contracts/libraries/Path.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
 
@@ -13,11 +12,12 @@ import './base/PeripheryPaymentsWithFeeExtended.sol';
 import './base/OracleSlippage.sol';
 import './libraries/Constants.sol';
 import './libraries/SmartRouterHelper.sol';
+import './libraries/PathForeign.sol';
 
 /// @title PancakeSwap V3 Swap Router
 /// @notice Router for stateless execution of swaps against PancakeSwap V3
 abstract contract V3SwapRouter is IV3SwapRouter, PeripheryPaymentsWithFeeExtended, OracleSlippage, ReentrancyGuard {
-    using Path for bytes;
+    using PathForeign for bytes;
     using SafeCast for uint256;
 
     /// @dev Used as the placeholder value for amountInCached, because the computed amount in for an exact output swap
@@ -40,8 +40,8 @@ abstract contract V3SwapRouter is IV3SwapRouter, PeripheryPaymentsWithFeeExtende
     ) external override {
         require(amount0Delta > 0 || amount1Delta > 0); // swaps entirely within 0-liquidity regions are not supported
         SwapCallbackData memory data = abi.decode(_data, (SwapCallbackData));
-        (address tokenIn, address tokenOut, uint24 fee) = data.path.decodeFirstPool();
-        SmartRouterHelper.verifyCallback(deployer, tokenIn, tokenOut, fee);
+        (address pool, address tokenIn, address tokenOut) = data.path.decodeFirstPool();
+        require(msg.sender == pool);
 
         (bool isExactInput, uint256 amountToPay) =
             amount0Delta > 0
@@ -75,12 +75,11 @@ abstract contract V3SwapRouter is IV3SwapRouter, PeripheryPaymentsWithFeeExtende
         if (recipient == Constants.MSG_SENDER) recipient = msg.sender;
         else if (recipient == Constants.ADDRESS_THIS) recipient = address(this);
 
-        (address tokenIn, address tokenOut, uint24 fee) = data.path.decodeFirstPool();
+        (address pool, address tokenIn, address tokenOut) = data.path.decodeFirstPool();
 
         bool zeroForOne = tokenIn < tokenOut;
 
-        (int256 amount0, int256 amount1) =
-            SmartRouterHelper.getPool(deployer, tokenIn, tokenOut, fee).swap(
+        (int256 amount0, int256 amount1) = IPancakeV3Pool(pool).swap(
                 recipient,
                 zeroForOne,
                 amountIn.toInt256(),
@@ -113,7 +112,7 @@ abstract contract V3SwapRouter is IV3SwapRouter, PeripheryPaymentsWithFeeExtende
             params.recipient,
             params.sqrtPriceLimitX96,
             SwapCallbackData({
-                path: abi.encodePacked(params.tokenIn, params.fee, params.tokenOut),
+                path: abi.encodePacked(params.tokenIn, params.pool, params.tokenOut),
                 payer: hasAlreadyPaid ? address(this) : msg.sender
             })
         );
@@ -126,7 +125,7 @@ abstract contract V3SwapRouter is IV3SwapRouter, PeripheryPaymentsWithFeeExtende
         bool hasAlreadyPaid;
         if (params.amountIn == Constants.CONTRACT_BALANCE) {
             hasAlreadyPaid = true;
-            (address tokenIn, , ) = params.path.decodeFirstPool();
+            (, address tokenIn, ) = params.path.decodeFirstPool();
             params.amountIn = IERC20(tokenIn).balanceOf(address(this));
         }
 
@@ -171,12 +170,11 @@ abstract contract V3SwapRouter is IV3SwapRouter, PeripheryPaymentsWithFeeExtende
         if (recipient == Constants.MSG_SENDER) recipient = msg.sender;
         else if (recipient == Constants.ADDRESS_THIS) recipient = address(this);
 
-        (address tokenOut, address tokenIn, uint24 fee) = data.path.decodeFirstPool();
+        (address pool, address tokenOut, address tokenIn) = data.path.decodeFirstPool();
 
         bool zeroForOne = tokenIn < tokenOut;
 
-        (int256 amount0Delta, int256 amount1Delta) =
-            SmartRouterHelper.getPool(deployer, tokenIn, tokenOut, fee).swap(
+        (int256 amount0Delta, int256 amount1Delta) = IPancakeV3Pool(pool).swap(
                 recipient,
                 zeroForOne,
                 -amountOut.toInt256(),
@@ -208,7 +206,7 @@ abstract contract V3SwapRouter is IV3SwapRouter, PeripheryPaymentsWithFeeExtende
             params.amountOut,
             params.recipient,
             params.sqrtPriceLimitX96,
-            SwapCallbackData({path: abi.encodePacked(params.tokenOut, params.fee, params.tokenIn), payer: msg.sender})
+            SwapCallbackData({path: abi.encodePacked(params.tokenOut, params.pool, params.tokenIn), payer: msg.sender})
         );
 
         require(amountIn <= params.amountInMaximum);
