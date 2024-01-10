@@ -42,6 +42,37 @@ abstract contract V2SwapRouter is IV2SwapRouter, ImmutableState, PeripheryPaymen
         }
     }
 
+
+    // supports any UniswapV2 based pools, not just the own ones
+    // supports fee-on-transfer tokens
+    // requires the initial amount to have already been sent to the first pair
+    // `refundETH` should be called at very end of all swaps
+    function _swapExternal(address[] memory pools, address tokenIn, address _to) private returns (address) {
+        for (uint256 i; i < pools.length; i++) {
+            IUniswapV2Pair pair = IUniswapV2Pair(pools[i]);
+            address token0 = pair.token0();
+            address token1 = pair.token1();
+            uint256 amountInput;
+            uint256 amountOutput;
+            // scope to avoid stack too deep errors
+            {
+                (uint256 reserve0, uint256 reserve1, ) = pair.getReserves();
+                (uint256 reserveInput, uint256 reserveOutput) =
+                    tokenIn == token0 ? (reserve0, reserve1) : (reserve1, reserve0);
+                amountInput = IERC20(tokenIn).balanceOf(address(pair)).sub(reserveInput);
+                amountOutput = SmartRouterHelper.getAmountOut(amountInput, reserveInput, reserveOutput);
+            }
+            (uint256 amount0Out, uint256 amount1Out) =
+                tokenIn == token0 ? (uint256(0), amountOutput) : (amountOutput, uint256(0));
+            address to = i < pools.length - 1 ? pools[i + 1] : _to;
+            pair.swap(amount0Out, amount1Out, to, new bytes(0));
+
+            tokenIn = tokenIn == token0 ? token1 : token0;
+        }
+        return tokenIn;
+    }
+
+
     /// @inheritdoc IV2SwapRouter
     function swapExactTokensForTokens(
         uint256 amountIn,
@@ -75,7 +106,43 @@ abstract contract V2SwapRouter is IV2SwapRouter, ImmutableState, PeripheryPaymen
         _swap(path, to);
 
         amountOut = dstToken.balanceOf(to).sub(balanceBefore);
-        require(amountOut >= amountOutMin);
+        require(amountOut >= amountOutMin, 'InsufficientOutput');
+    }
+
+
+    function swapExactTokensForTokensExternal(
+        uint256 amountIn,
+        uint256 amountOutMin,
+        address[] calldata pools,
+        address tokenIn,
+        address tokenOut,
+        address to
+    ) external payable override nonReentrant returns (uint256 amountOut) {
+
+        // use amountIn == Constants.CONTRACT_BALANCE as a flag to swap the entire balance of the contract
+        bool hasAlreadyPaid;
+        if (amountIn == Constants.CONTRACT_BALANCE) {
+            hasAlreadyPaid = true;
+            amountIn = IERC20(tokenIn).balanceOf(address(this));
+        }
+
+        pay(
+            tokenIn,
+            hasAlreadyPaid ? address(this) : msg.sender,
+            pools[0],
+            amountIn
+        );
+
+        // find and replace to addresses
+        if (to == Constants.MSG_SENDER) to = msg.sender;
+        else if (to == Constants.ADDRESS_THIS) to = address(this);
+
+        uint256 balanceBefore = IERC20(tokenOut).balanceOf(to);
+
+        require(_swapExternal(pools, tokenIn, to) == tokenOut, '!tokenOut');
+
+        amountOut = IERC20(tokenOut).balanceOf(to).sub(balanceBefore);
+        require(amountOut >= amountOutMin, 'InsufficientOutput');
     }
 
     /// @inheritdoc IV2SwapRouter
@@ -88,7 +155,7 @@ abstract contract V2SwapRouter is IV2SwapRouter, ImmutableState, PeripheryPaymen
         address srcToken = path[0];
 
         amountIn = SmartRouterHelper.getAmountsIn(factoryV2, amountOut, path)[0];
-        require(amountIn <= amountInMax);
+        require(amountIn <= amountInMax, '>maxIn');
 
         pay(srcToken, msg.sender, SmartRouterHelper.pairFor(factoryV2, srcToken, path[1]), amountIn);
 

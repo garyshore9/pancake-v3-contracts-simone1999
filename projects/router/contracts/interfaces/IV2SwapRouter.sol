@@ -20,6 +20,26 @@ interface IV2SwapRouter {
         address to
     ) external payable returns (uint256 amountOut);
 
+    /// @notice Swaps `amountIn` of one token for as much as possible of another token
+    /// @notice works with external V2 based pools
+    /// @dev Setting `amountIn` to 0 will cause the contract to look up its own balance,
+    /// and swap the entire amount, enabling contracts to send tokens before calling this function.
+    /// @param amountIn The amount of token to swap
+    /// @param amountOutMin The minimum amount of output that must be received
+    /// @param pools The ordered list of V2 pools to swap through
+    /// @param tokenIn The input token address
+    /// @param tokenOut The output token address
+    /// @param to The recipient address
+    /// @return amountOut The amount of the received token
+    function swapExactTokensForTokensExternal(
+        uint256 amountIn,
+        uint256 amountOutMin,
+        address[] calldata pools,
+        address tokenIn,
+        address tokenOut,
+        address to
+    ) external payable returns (uint256 amountOut);
+
     /// @notice Swaps as little as possible of one token for an exact amount of another token
     /// @param amountOut The amount of token to swap for
     /// @param amountInMax The maximum amount of input that the caller will pay

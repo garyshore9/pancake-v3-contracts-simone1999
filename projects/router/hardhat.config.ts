@@ -23,7 +23,7 @@ const config: HardhatUserConfig = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 10,
+            runs: 200,
           },
         },
       },
@@ -32,7 +32,7 @@ const config: HardhatUserConfig = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 10,
+            runs: 200,
           },
         },
       },
@@ -41,7 +41,7 @@ const config: HardhatUserConfig = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 10,
+            runs: 200,
           },
         },
       },
@@ -50,7 +50,7 @@ const config: HardhatUserConfig = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 10,
+            runs: 200,
           },
         },
       },
@@ -59,7 +59,7 @@ const config: HardhatUserConfig = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 10,
+            runs: 200,
           },
         },
       },
