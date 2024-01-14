@@ -32,12 +32,27 @@ abstract contract V3SwapRouter is IV3SwapRouter, PeripheryPaymentsWithFeeExtende
         address payer;
     }
 
-    /// @inheritdoc IPancakeV3SwapCallback
+    /// catches all V3 callbacks like uniswapV3SwapCallback and forwards their decoded parameter to pancakeV3SwapCallback
+    fallback(bytes calldata _input) external returns (bytes memory) {
+        (int256 amount0Delta, int256 amount1Delta, bytes memory _data) = abi.decode(_input[4:], (int256, int256, bytes));
+        pancakeV3SwapCallback(amount0Delta, amount1Delta, _data);
+        return "";
+    }
+
+    /// @notice Called to `msg.sender` after executing a swap via IPancakeV3Pool#swap.
+    /// @dev In the implementation you must pay the pool tokens owed for the swap.
+    /// The caller of this method must be checked to be a PancakeV3Pool deployed by the canonical PancakeV3Factory.
+    /// amount0Delta and amount1Delta can both be 0 if no tokens were swapped.
+    /// @param amount0Delta The amount of token0 that was sent (negative) or must be received (positive) by the pool by
+    /// the end of the swap. If positive, the callback must send that amount of token0 to the pool.
+    /// @param amount1Delta The amount of token1 that was sent (negative) or must be received (positive) by the pool by
+    /// the end of the swap. If positive, the callback must send that amount of token1 to the pool.
+    /// @param _data Any data passed through by the caller via the IPancakeV3PoolActions#swap call
     function pancakeV3SwapCallback(
         int256 amount0Delta,
         int256 amount1Delta,
-        bytes calldata _data
-    ) external override {
+        bytes memory _data
+    ) private {
         require(amount0Delta > 0 || amount1Delta > 0); // swaps entirely within 0-liquidity regions are not supported
         SwapCallbackData memory data = abi.decode(_data, (SwapCallbackData));
         (address pool, address tokenIn, address tokenOut) = data.path.decodeFirstPool();
